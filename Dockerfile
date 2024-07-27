@@ -44,6 +44,7 @@ RUN apt-get install -y \
     libswscale-dev \
     # Qt 6
     qt6-base-dev \
+    qt6-wayland-dev \
     qt6-base-private-dev \
     libqt6opengl6-dev \
     qt6-multimedia-dev \
