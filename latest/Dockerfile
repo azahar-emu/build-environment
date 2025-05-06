@@ -56,6 +56,9 @@ RUN ln -s /usr/bin/clang-19 /usr/bin/clang
 RUN ln -s /usr/bin/clang++-19 /usr/bin/clang++
 RUN ln -s /usr/bin/clang-format-19 /usr/bin/clang-format
 
+# Ensure that lupdate is in path
+RUN ln -s /usr/lib/qt6/bin/lupdate /usr/local/bin/lupdate
+
 # Download Transifex client
 RUN curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
 RUN mv /tx /usr/bin/
