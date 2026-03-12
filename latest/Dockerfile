@@ -18,6 +18,7 @@ RUN apt-get install -y \
     cmake \
     curl \
     file \
+    gcc \
     git \
     libc++-19-dev \
     lld \
