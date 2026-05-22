@@ -50,7 +50,23 @@ RUN apt-get install -y \
     glslang-dev \
     glslang-tools \
     # Other libraries
-    libsdl2-dev
+    libsdl2-dev \
+    # MXE build tools
+    7zip \
+    autoconf \
+    automake \
+    autopoint \
+    bison \
+    flex \
+    gperf \
+    intltool \
+    libssl-dev \
+    libtool-bin \
+    lzip \
+    python-is-python3 \
+    python3-mako \
+    python3-setuptools \
+    wine64-tools
 
 # Create Clang symlinks
 RUN ln -s /usr/bin/clang-19 /usr/bin/clang
@@ -71,3 +87,25 @@ RUN wget https://github.com/linuxdeploy/linuxdeploy-plugin-checkrt/releases/down
 RUN chmod a+x linuxdeploy-x86_64.AppImage
 RUN chmod a+x linuxdeploy-plugin-qt-x86_64.AppImage
 RUN chmod a+x linuxdeploy-plugin-checkrt-x86_64.sh
+
+# Set up MXE environment
+RUN git clone https://github.com/mxe/mxe
+WORKDIR /mxe
+RUN git checkout --detach 0c8fa7f25e1d46321a3dda7103396c4c50a65ed8 # April 29th 2026
+RUN make boost nsis qt6-qtbase qt6-qtmultimedia qt6-qttools \
+        -j2 \
+        MXE_TARGETS='x86_64-w64-mingw32.shared' \
+        MXE_PLUGIN_DIRS=plugins/gcc15 \
+        MXE_USE_CCACHE= && \
+    rm -rf /mxe/pkg/
+# TODO: Merge into above command after https://github.com/mxe/mxe/issues/3314 is fixed
+RUN make cryptopp \
+        -j2 \
+        MXE_TARGETS='x86_64-w64-mingw32.shared' \
+        MXE_PLUGIN_DIRS=plugins/gcc15 \
+        MXE_USE_CCACHE= && \
+    rm -rf /mxe/pkg/
+RUN printf "\nMXE_PLUGIN_DIRS=plugins/gcc15\nMXE_USE_CCACHE=" >> /mxe/settings.mk
+RUN echo 'export PATH="/mxe/usr/bin:${PATH}"' >> /etc/bash.bashrc
+
+WORKDIR /
