@@ -45,6 +45,7 @@ RUN apt-get install -y \
     qt6-l10n-tools \
     qt6-tools-dev \
     qt6-tools-dev-tools \
+    qt6-translations-l10n \
     libgl-dev \
     # glslang
     glslang-dev \
@@ -93,7 +94,7 @@ RUN git clone https://github.com/mxe/mxe
 WORKDIR /mxe
 RUN git checkout --detach 0c8fa7f25e1d46321a3dda7103396c4c50a65ed8 # April 29th 2026
 # Note: JOBS = parallel jobs for *each* package, -j = how many packag*es* to build in parallel
-RUN make boost nsis qt6-qtbase qt6-qtmultimedia qt6-qttools \
+RUN make boost nsis qt6-qtbase qt6-qtmultimedia qt6-qttools qt6-qttranslations \
         -j1 \
         JOBS=$(nproc) \
         MXE_TARGETS='x86_64-w64-mingw32.shared' \
