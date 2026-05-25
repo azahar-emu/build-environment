@@ -1,1 +1,1 @@
-docker push opensauce04/azahar-build-environment:latest
+docker push opensauce04/azahar-build-environment:$(uname -m)
