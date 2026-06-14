@@ -2,13 +2,13 @@ FROM debian:trixie
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Create a user account lime (UID 1027) that the container will run as
+## 1. Create a user account 'citra' (UID 1027) that the container will run as
 RUN useradd -m -u 1027 -s /bin/bash citra
 
-# Update repos + upgrade system
+## 2. Update repos + upgrade system
 RUN apt-get update && apt-get -y full-upgrade
 
-# Install package dependencies
+## 3. Install package dependencies
 RUN apt-get install -y \
     # Tools
     build-essential \
@@ -74,22 +74,10 @@ RUN ln -s /usr/bin/clang-19 /usr/bin/clang
 RUN ln -s /usr/bin/clang++-19 /usr/bin/clang++
 RUN ln -s /usr/bin/clang-format-19 /usr/bin/clang-format
 
-# Ensure that lupdate is in path
+# Ensure that lupdate is in PATH
 RUN ln -s /usr/lib/qt6/bin/lupdate /usr/local/bin/lupdate
 
-# Download Transifex client
-RUN curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
-RUN mv /tx /usr/bin/
-
-# Download tools for building AppImages
-RUN wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-RUN wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-RUN wget https://github.com/linuxdeploy/linuxdeploy-plugin-checkrt/releases/download/continuous/linuxdeploy-plugin-checkrt-x86_64.sh
-RUN chmod a+x linuxdeploy-x86_64.AppImage
-RUN chmod a+x linuxdeploy-plugin-qt-x86_64.AppImage
-RUN chmod a+x linuxdeploy-plugin-checkrt-x86_64.sh
-
-# Set up MXE environment
+## 4. Set up MXE build environment
 RUN git clone https://github.com/mxe/mxe
 WORKDIR /mxe
 RUN git checkout --detach 0c8fa7f25e1d46321a3dda7103396c4c50a65ed8 # April 29th 2026
@@ -113,3 +101,24 @@ RUN printf "\nMXE_PLUGIN_DIRS=plugins/gcc15\nMXE_USE_CCACHE=" >> /mxe/settings.m
 RUN echo 'export PATH="/mxe/usr/bin:${PATH}"' >> /etc/bash.bashrc
 
 WORKDIR /
+
+## 5. Download Transifex client
+RUN curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
+RUN mv /tx /usr/bin/
+
+## 6. Download AppImage tools
+RUN wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+RUN wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+RUN wget https://github.com/linuxdeploy/linuxdeploy-plugin-checkrt/releases/download/continuous/linuxdeploy-plugin-checkrt-x86_64.sh
+RUN chmod a+x linuxdeploy-x86_64.AppImage
+RUN chmod a+x linuxdeploy-plugin-qt-x86_64.AppImage
+RUN chmod a+x linuxdeploy-plugin-checkrt-x86_64.sh
+
+## 7. Install ktlint (and by extension, Homebrew, as it's where ktlint is packaged)
+# Standard Homebrew setup
+RUN touch /.dockerenv # Allows Homebrew to run as root, which is otherwise prohibited
+RUN yes | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+RUN test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" && \
+    echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bashrc
+# Install ktlint
+RUN /home/linuxbrew/.linuxbrew/bin/brew install -y ktlint
