@@ -67,7 +67,13 @@ RUN apt-get install -y \
     python-is-python3 \
     python3-mako \
     python3-setuptools \
-    wine64-tools
+    wine64-tools \
+    # Dev convenience
+    htop \
+    fastfetch
+
+# Create convenient neofetch symlink
+RUN ln -s /usr/bin/fastfetch /usr/local/bin/neofetch
 
 # Create Clang symlinks
 RUN ln -s /usr/bin/clang-19 /usr/bin/clang
