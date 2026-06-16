@@ -119,6 +119,6 @@ RUN chmod a+x linuxdeploy-plugin-checkrt-x86_64.sh
 RUN touch /.dockerenv # Allows Homebrew to run as root, which is otherwise prohibited
 RUN yes | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 RUN test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" && \
-    echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bashrc
+    echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> /etc/bash.bashrc
 # Install ktlint
 RUN /home/linuxbrew/.linuxbrew/bin/brew install -y ktlint
