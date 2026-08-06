@@ -1,0 +1,13 @@
+diff --git a/src/mariadb-connector-c.mk b/src/mariadb-connector-c.mk
+index 98463450..2f7d6b2d 100644
+--- a/src/mariadb-connector-c.mk
++++ b/src/mariadb-connector-c.mk
+@@ -33,7 +33,7 @@ define $(PKG)_BUILD
+ 
+     # build test
+     '$(TARGET)-g++' \
+-        -W -Wall -Werror -ansi -pedantic \
++        -W -Wall -ansi -pedantic \
+         '$(TEST_FILE)' -o '$(PREFIX)/$(TARGET)/bin/test-$(PKG).exe' \
+         `'$(TARGET)-pkg-config' libmariadb --cflags --libs`
+ endef

@@ -1,0 +1,24 @@
+diff --git a/src/libcaca.mk b/src/libcaca.mk
+index da630b15..95d215c2 100644
+--- a/src/libcaca.mk
++++ b/src/libcaca.mk
+@@ -19,9 +19,8 @@ endef
+ 
+ define $(PKG)_BUILD
+     cd '$(SOURCE_DIR)' && autoreconf -fi
+-    $(if $(BUILD_STATIC),                                         \
+-        $(SED) -i 's/__declspec(dllimport)//' '$(1)/caca/caca.h'; \
+-        $(SED) -i 's/__declspec(dllimport)//' '$(1)/caca/caca0.h')
++    $(SED) -i 's/__declspec(dllimport)//' '$(1)/caca/caca.h'
++    $(SED) -i 's/__declspec(dllimport)//' '$(1)/caca/caca0.h'
+     cd '$(BUILD_DIR)' && '$(SOURCE_DIR)/configure' \
+         $(MXE_CONFIGURE_OPTS) \
+         --disable-csharp \
+@@ -29,6 +28,7 @@ define $(PKG)_BUILD
+         --disable-python \
+         --disable-ruby \
+         --disable-doc \
++        --disable-shared \
+         $(if $(BUILD_STATIC), LIBS=-luuid)
+     $(MAKE) -C '$(BUILD_DIR)' -j '$(JOBS)'
+     $(MAKE) -C '$(BUILD_DIR)' -j 1 install

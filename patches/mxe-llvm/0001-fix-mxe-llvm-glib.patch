@@ -1,0 +1,12 @@
+diff --git a/src/glib.mk b/src/glib.mk
+index f8cc43e6..2c4eab44 100644
+--- a/src/glib.mk
++++ b/src/glib.mk
+@@ -47,7 +47,6 @@ define $(PKG)_BUILD
+     '$(MXE_MESON_WRAPPER)' \
+         $(MXE_MESON_OPTS) \
+         -Dtests=false \
+-        -Dforce_posix_threads=true \
+         '$(BUILD_DIR)' '$(SOURCE_DIR)'
+     '$(MXE_NINJA)' -C '$(BUILD_DIR)' -j '$(JOBS)'
+     '$(MXE_NINJA)' -C '$(BUILD_DIR)' -j '$(JOBS)' install

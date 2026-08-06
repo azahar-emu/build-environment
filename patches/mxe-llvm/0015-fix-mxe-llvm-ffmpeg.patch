@@ -1,0 +1,18 @@
+diff --git a/src/ffmpeg.mk b/src/ffmpeg.mk
+index de175e8e..44537ea8 100644
+--- a/src/ffmpeg.mk
++++ b/src/ffmpeg.mk
+@@ -43,11 +43,11 @@ define $(PKG)_BUILD
+         --enable-gpl \
+         --enable-version3 \
+         --extra-libs='-mconsole' \
+-        --enable-gnutls \
++        --disable-gnutls \
+         --enable-libass \
+         --enable-libbluray \
+         --enable-libbs2b \
+-        --enable-libcaca \
++        --disable-libcaca \
+         --enable-libmp3lame \
+         --enable-libopencore-amrnb \
+         --enable-libopencore-amrwb \

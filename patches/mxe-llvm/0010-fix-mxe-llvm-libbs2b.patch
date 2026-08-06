@@ -1,0 +1,17 @@
+diff --git a/src/libbs2b.mk b/src/libbs2b.mk
+index 95e738d4..805bdf6e 100644
+--- a/src/libbs2b.mk
++++ b/src/libbs2b.mk
+@@ -21,9 +21,10 @@ define $(PKG)_BUILD
+     cd '$(1)' && autoreconf -fi
+     cd '$(1)' && ./configure \
+         $(MXE_CONFIGURE_OPTS) \
++        LIBS='-l:libclang_rt.builtins-x86_64.a' \
+         ac_cv_func_malloc_0_nonnull=yes
+     # The ac_cv_func_malloc_0_nonnull=yes is needed because the configure
+     # check tries to run a program.
+     $(MAKE) -C '$(1)' -j '$(JOBS)' LDFLAGS='-no-undefined' $(MXE_DISABLE_CRUFT)
+     $(MAKE) -C '$(1)' -j 1 install LDFLAGS='-no-undefined' $(MXE_DISABLE_CRUFT)
+-endef
+\ No newline at end of file
++endef

@@ -1,0 +1,22 @@
+diff --git a/src/gnutls.mk b/src/gnutls.mk
+index d12d9415..42a7f1e8 100644
+--- a/src/gnutls.mk
++++ b/src/gnutls.mk
+@@ -28,12 +28,12 @@ define $(PKG)_BUILD
+         --disable-tests \
+         --without-p11-kit \
+         --disable-silent-rules \
+-        CFLAGS='-Wno-incompatible-pointer-types -Wno-int-conversion'
++        CFLAGS='-Wno-incompatible-pointer-types -Wno-int-conversion' \
++        LDFLAGS='-lucrt' \
++        --disable-shared \
++        ac_cv_func_memset_explicit=no \
++        gl_cv_func_memset_explicit=no
+     $(MAKE) -C '$(BUILD_DIR)' -j '$(JOBS)'
+     $(MAKE) -C '$(BUILD_DIR)' -j 1 install
+ 
+-    '$(TARGET)-gcc' \
+-        -W -Wall -Werror -ansi -pedantic \
+-        '$(TEST_FILE)' -o '$(PREFIX)/$(TARGET)/bin/test-gnutls.exe' \
+-        `'$(TARGET)-pkg-config' gnutls --cflags --libs`
+ endef

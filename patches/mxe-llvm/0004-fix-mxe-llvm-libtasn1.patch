@@ -1,0 +1,15 @@
+diff --git a/src/libtasn1.mk b/src/libtasn1.mk
+index 01fe8f02..fbff533b 100644
+--- a/src/libtasn1.mk
++++ b/src/libtasn1.mk
+@@ -19,6 +19,9 @@ endef
+ 
+ define $(PKG)_BUILD
+     cd '$(1)' && ./configure \
+-        $(MXE_CONFIGURE_OPTS)
++        $(MXE_CONFIGURE_OPTS) \
++        LDFLAGS='-lucrt' \
++        ac_cv_func_memset_explicit=no \
++        gl_cv_func_memset_explicit=no
+     $(MAKE) -C '$(1)' -j '$(JOBS)' install
+ endef

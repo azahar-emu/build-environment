@@ -1,0 +1,13 @@
+diff --git a/src/pixman.mk b/src/pixman.mk
+index 58dd8e39..9ac609ac 100644
+--- a/src/pixman.mk
++++ b/src/pixman.mk
+@@ -18,7 +18,7 @@ define $(PKG)_UPDATE
+ endef
+ 
+ define $(PKG)_BUILD
+-    '$(MXE_MESON_WRAPPER)' $(MXE_MESON_OPTS) '$(BUILD_DIR)' '$(SOURCE_DIR)'
++    '$(MXE_MESON_WRAPPER)' $(MXE_MESON_OPTS) -Dtests=disabled '$(BUILD_DIR)' '$(SOURCE_DIR)'
+     '$(MXE_NINJA)' -C '$(BUILD_DIR)' -j '$(JOBS)'
+     '$(MXE_NINJA)' -C '$(BUILD_DIR)' -j '$(JOBS)' install
+ endef

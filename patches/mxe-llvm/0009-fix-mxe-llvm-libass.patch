@@ -1,0 +1,14 @@
+diff --git a/src/libass.mk b/src/libass.mk
+index 227ffccb..335435ee 100644
+--- a/src/libass.mk
++++ b/src/libass.mk
+@@ -14,7 +14,8 @@ define $(PKG)_BUILD
+     cd '$(BUILD_DIR)' && '$(SOURCE_DIR)/configure' \
+         $(MXE_CONFIGURE_OPTS) \
+         --enable-fontconfig \
+-        --enable-harfbuzz
++        --enable-harfbuzz \
++        ac_cv_func_strndup=no
+     $(MAKE) -C '$(BUILD_DIR)' -j '$(JOBS)'
+     $(MAKE) -C '$(BUILD_DIR)' -j 1 install
+ 

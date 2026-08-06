@@ -1,0 +1,12 @@
+diff --git a/src/tiff.mk b/src/tiff.mk
+index 85806567..415e030b 100644
+--- a/src/tiff.mk
++++ b/src/tiff.mk
+@@ -21,6 +21,7 @@ endef
+ define $(PKG)_BUILD
+     cd '$(1)' && ./configure \
+         $(MXE_CONFIGURE_OPTS) \
++        LDFLAGS='-lclang_rt.builtins-x86_64' \
+         --without-x
+     $(MAKE) -C '$(1)' -j '$(JOBS)' install $(MXE_DISABLE_CRUFT)
+ endef

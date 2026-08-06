@@ -1,0 +1,12 @@
+diff --git a/src/gmp.mk b/src/gmp.mk
+index d630bc84..537abd53 100644
+--- a/src/gmp.mk
++++ b/src/gmp.mk
+@@ -26,6 +26,7 @@ define $(PKG)_BUILD
+     cd '$(1)' && CC_FOR_BUILD=$(BUILD_CC) ./configure \
+         $(MXE_CONFIGURE_OPTS) \
+         CFLAGS='-std=gnu99' \
++        --disable-shared \
+         --enable-cxx \
+         --without-readline
+     $(MAKE) -C '$(1)' -j '$(JOBS)'

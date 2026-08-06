@@ -61,6 +61,7 @@ RUN apt-get install -y \
     flex \
     gperf \
     intltool \
+    libclang-19-dev \
     libssl-dev \
     libtool-bin \
     lzip \
@@ -69,41 +70,91 @@ RUN apt-get install -y \
     python3-setuptools \
     wine64-tools \
     # Dev convenience
+    fastfetch \
     htop \
-    fastfetch
+    vim-tiny
 
-# Create convenient neofetch symlink
+# Create convenient symlinks
 RUN ln -s /usr/bin/fastfetch /usr/local/bin/neofetch
+RUN ln -s /usr/bin/vim.tiny /usr/local/bin/vim
 
 # Create Clang symlinks
 RUN ln -s /usr/bin/clang-19 /usr/bin/clang
 RUN ln -s /usr/bin/clang++-19 /usr/bin/clang++
 RUN ln -s /usr/bin/clang-format-19 /usr/bin/clang-format
+RUN ln -s /usr/bin/llvm-ar-19 /usr/bin/llvm-ar
 
 # Ensure that lupdate is in PATH
 RUN ln -s /usr/lib/qt6/bin/lupdate /usr/local/bin/lupdate
 
+
 ## 4. Set up MXE build environment
+RUN git config --global user.name "Citra" && \
+    git config --global user.email "citra"
+
 RUN git clone https://github.com/mxe/mxe
 WORKDIR /mxe
-RUN git checkout --detach 0c8fa7f25e1d46321a3dda7103396c4c50a65ed8 # April 29th 2026
+RUN git checkout --detach de7d7a0ad6e016077cd9d73c1297780ef2604401 # June 3rd 2026
+RUN git remote add llvm-plugin https://github.com/kleisauke/mxe && \
+    git fetch llvm-plugin
+RUN git cherry-pick fd5d995b37efe412dff7ec76177e8cb14f5ea8dc # Base LLVM plugin,  June 5th 2026
+RUN git cherry-pick 2908b4703ce16b6b6d8f4b5df1dc0b804ac4ce7d # Meson wrapper improvements,  June 5th 2026
+
 # Note: JOBS = parallel jobs for *each* package, -j = how many packag*es* to build in parallel
-RUN make boost nsis qt6-qtbase qt6-qtmultimedia qt6-qttools qt6-qttranslations \
+# 4.1: Make stuff that requires GCC to work properly
+RUN make nsis \
         -j1 \
         JOBS=$(nproc) \
         MXE_TARGETS='x86_64-w64-mingw32.shared' \
-        MXE_PLUGIN_DIRS=plugins/gcc15 \
+        MXE_PLUGIN_DIRS=plugins/gcc16 \
         MXE_USE_CCACHE= && \
     rm -rf /mxe/pkg/
-# TODO: Merge into above command after https://github.com/mxe/mxe/issues/3314 is fixed
-RUN make cryptopp \
+# 4.2: Make initial MXE LLVM
+RUN make llvm \
+        -j1 \
+        JOBS=$(nproc) \
+        MXE_TARGETS=$(/usr/share/misc/config.guess) \
+        MXE_PLUGIN_DIRS=plugins/gcc16 \
+        MXE_USE_CCACHE= && \
+    rm -rf /mxe/pkg/
+# 4.3: Apply patches for building with LLVM plugin
+#      (has be done after we're done with GCC, unless we want to
+#       waste time making the recipe support both)
+RUN mkdir /root/patches/       # Why are you this way, Docker.
+COPY ./patches/ /root/patches/
+
+RUN git apply --index /root/patches/mxe-llvm/*.patch && \
+    git commit -m "Apply LLVM plugin build fixes"
+# 4.4: Make MinGW LLVM
+RUN make llvm \
         -j1 \
         JOBS=$(nproc) \
         MXE_TARGETS='x86_64-w64-mingw32.shared' \
-        MXE_PLUGIN_DIRS=plugins/gcc15 \
+        MXE_PLUGIN_DIRS=plugins/llvm-mingw \
         MXE_USE_CCACHE= && \
     rm -rf /mxe/pkg/
-RUN printf "\nMXE_PLUGIN_DIRS=plugins/gcc15\nMXE_USE_CCACHE=" >> /mxe/settings.mk
+RUN ln -s /mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libunwind.dll.a \
+          /mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libunwind.a
+RUN ln -s /mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libc++.dll.a \
+          /mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libc++.a
+# 4.5: Make libgmp without problematic .la file
+RUN make gmp \
+        -j1 \
+        JOBS=$(nproc) \
+        MXE_TARGETS='x86_64-w64-mingw32.shared' \
+        MXE_PLUGIN_DIRS=plugins/llvm-mingw \
+        MXE_USE_CCACHE= && \
+    rm /mxe/usr/x86_64-w64-mingw32.shared/lib/libgmp.la && \
+    rm -rf /mxe/pkg/
+# 4.6: Make all of the Qt stuff we need
+RUN make qt6-qtbase qt6-qtmultimedia qt6-qttools qt6-qttranslations \
+        -j1 \
+        JOBS=$(nproc) \
+        MXE_TARGETS='x86_64-w64-mingw32.shared' \
+        MXE_PLUGIN_DIRS=plugins/llvm-mingw \
+        MXE_USE_CCACHE= && \
+    rm -rf /mxe/pkg/
+RUN printf "\nMXE_PLUGIN_DIRS=plugins/llvm-mingw\nMXE_USE_CCACHE=" >> /mxe/settings.mk
 RUN echo 'export PATH="/mxe/usr/bin:${PATH}"' >> /etc/bash.bashrc
 
 WORKDIR /

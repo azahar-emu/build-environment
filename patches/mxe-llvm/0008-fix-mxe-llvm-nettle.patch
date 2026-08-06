@@ -1,0 +1,13 @@
+diff --git a/src/nettle.mk b/src/nettle.mk
+index 610ac381..78935534 100644
+--- a/src/nettle.mk
++++ b/src/nettle.mk
+@@ -25,6 +25,8 @@ define $(PKG)_BUILD
+         $(MXE_CONFIGURE_OPTS) \
+         CFLAGS='-std=gnu99' \
+         --disable-documentation \
++        --disable-shared \
++        --enable-static \
+         $(if $(call seq,darwin,$(OS_SHORT_NAME)),gmp_cv_prog_exeext_for_build='')
+     $(MAKE) -C '$(BUILD_DIR)' -j '$(JOBS)' SUBDIRS=
+     $(MAKE) -C '$(BUILD_DIR)' -j 1 install SUBDIRS=

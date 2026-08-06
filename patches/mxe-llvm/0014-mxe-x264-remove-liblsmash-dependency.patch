@@ -1,0 +1,13 @@
+diff --git a/src/x264.mk b/src/x264.mk
+index 4362b89a..37c10f94 100644
+--- a/src/x264.mk
++++ b/src/x264.mk
+@@ -8,7 +8,7 @@ $(PKG)_CHECKSUM := 6eeb82934e69fd51e043bd8c5b0d152839638d1ce7aa4eea65a3fedcf83ff
+ $(PKG)_SUBDIR   := $(PKG)-$($(PKG)_VERSION)
+ $(PKG)_FILE     := $(PKG)-$($(PKG)_VERSION).tar.bz2
+ $(PKG)_URL      := https://code.videolan.org/videolan/x264/-/archive/$($(PKG)_VERSION)/$($(PKG)_FILE)
+-$(PKG)_DEPS     := cc liblsmash $(BUILD)~nasm
++$(PKG)_DEPS     := cc $(BUILD)~nasm
+ 
+ define $(PKG)_UPDATE
+     $(WGET) -q -O- 'https://code.videolan.org/videolan/x264/-/commits/master.atom' | \

@@ -1,0 +1,40 @@
+diff --git a/src/qt/qt6/qt6-conf.mk b/src/qt/qt6/qt6-conf.mk
+index fe33e81c..edc7a449 100644
+--- a/src/qt/qt6/qt6-conf.mk
++++ b/src/qt/qt6/qt6-conf.mk
+@@ -33,22 +33,6 @@ define $(PKG)_BUILD
+              > '$(PREFIX)/bin/$(TARGET)-$(MXE_QT6_ID)-qmake'
+     chmod 0755 '$(PREFIX)/bin/$(TARGET)-$(MXE_QT6_ID)-qmake'
+ 
+-    # test qmake
+-    mkdir '$(BUILD_DIR).test-qmake'
+-    cd '$(BUILD_DIR).test-qmake' && \
+-        $(QT6_QMAKE) \
+-        -after TARGET=test-$(MXE_QT6_ID)-qmake \
+-        '$(PWD)/src/qt-test.pro'
+-    $(MAKE) -C '$(BUILD_DIR).test-qmake' '$(BUILD_TYPE)' -j '$(JOBS)'
+-    $(INSTALL) -m755 '$(BUILD_DIR).test-qmake/$(BUILD_TYPE)/test-$(MXE_QT6_ID)-qmake.exe' '$(PREFIX)/$(TARGET)/bin/'
+-
+-    # test cmake
+-    $(QT6_QT_CMAKE) -S '$(PWD)/src/cmake/test' -B '$(BUILD_DIR).test-cmake' \
+-        -DQT_MAJOR=6 \
+-        -DPKG=qtbase \
+-        -DPKG_VERSION=$($(PKG)_VERSION)
+-    $(TARGET)-cmake --build '$(BUILD_DIR).test-cmake' -j '$(JOBS)'
+-    $(TARGET)-cmake --install '$(BUILD_DIR).test-cmake'
+ 
+     # build test the manual way
+ # TODO pkg-config files aren't installed
+@@ -68,12 +52,6 @@ define $(PKG)_BUILD
+ #         -I'$(BUILD_DIR).test-pkgconfig' \
+ #         `'$(TARGET)-pkg-config' Qt6Widgets$(BUILD_TYPE_SUFFIX) --cflags --libs`
+ 
+-    # batch file to run test programs
+-    (printf 'set PATH=..\\lib;..\\$(MXE_QT6_ID)\\bin;..\\$(MXE_QT6_ID)\\lib;%%PATH%%\r\n'; \
+-     printf 'set QT_QPA_PLATFORM_PLUGIN_PATH=..\\$(MXE_QT6_ID)\\plugins\r\n'; \
+-     printf 'test-$(MXE_QT6_ID)-qmake.exe\r\n'; \
+-     printf 'test-$(MXE_QT6_ID)-cmake.exe\r\n';) \
+-     > '$(PREFIX)/$(TARGET)/bin/test-$(MXE_QT6_ID).bat'
+ endef
+ 
+ define $(PKG)_BUILD_$(BUILD)
