@@ -92,8 +92,9 @@ RUN ln -s /usr/lib/qt6/bin/lupdate /usr/local/bin/lupdate
 RUN git config --global user.name "Citra" && \
     git config --global user.email "citra"
 
+WORKDIR /opt
 RUN git clone https://github.com/mxe/mxe
-WORKDIR /mxe
+WORKDIR /opt/mxe
 RUN git checkout --detach de7d7a0ad6e016077cd9d73c1297780ef2604401 # June 3rd 2026
 RUN git remote add llvm-plugin https://github.com/kleisauke/mxe && \
     git fetch llvm-plugin
@@ -108,7 +109,7 @@ RUN make nsis \
         MXE_TARGETS='x86_64-w64-mingw32.shared' \
         MXE_PLUGIN_DIRS=plugins/gcc16 \
         MXE_USE_CCACHE= && \
-    rm -rf /mxe/pkg/
+    rm -rf ./pkg/
 # 4.2: Make initial MXE LLVM
 RUN make llvm \
         -j1 \
@@ -116,7 +117,7 @@ RUN make llvm \
         MXE_TARGETS=$(/usr/share/misc/config.guess) \
         MXE_PLUGIN_DIRS=plugins/gcc16 \
         MXE_USE_CCACHE= && \
-    rm -rf /mxe/pkg/
+    rm -rf ./pkg/
 # 4.3: Apply patches for building with LLVM plugin
 #      (has be done after we're done with GCC, unless we want to
 #       waste time making the recipe support both)
@@ -132,11 +133,11 @@ RUN make llvm \
         MXE_TARGETS='x86_64-w64-mingw32.shared' \
         MXE_PLUGIN_DIRS=plugins/llvm-mingw \
         MXE_USE_CCACHE= && \
-    rm -rf /mxe/pkg/
-RUN ln -s /mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libunwind.dll.a \
-          /mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libunwind.a
-RUN ln -s /mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libc++.dll.a \
-          /mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libc++.a
+    rm -rf ./pkg/
+RUN ln -s /opt/mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libunwind.dll.a \
+          /opt/mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libunwind.a
+RUN ln -s /opt/mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libc++.dll.a \
+          /opt/mxe/usr/x86_64-w64-mingw32.shared/x86_64-w64-mingw32/lib/libc++.a
 # 4.5: Make libgmp without problematic .la file
 RUN make gmp \
         -j1 \
@@ -144,8 +145,8 @@ RUN make gmp \
         MXE_TARGETS='x86_64-w64-mingw32.shared' \
         MXE_PLUGIN_DIRS=plugins/llvm-mingw \
         MXE_USE_CCACHE= && \
-    rm /mxe/usr/x86_64-w64-mingw32.shared/lib/libgmp.la && \
-    rm -rf /mxe/pkg/
+    rm /opt/mxe/usr/x86_64-w64-mingw32.shared/lib/libgmp.la && \
+    rm -rf ./pkg/
 # 4.6: Make all of the Qt stuff we need
 RUN make qt6-qtbase qt6-qtmultimedia qt6-qttools qt6-qttranslations \
         -j1 \
@@ -153,9 +154,9 @@ RUN make qt6-qtbase qt6-qtmultimedia qt6-qttools qt6-qttranslations \
         MXE_TARGETS='x86_64-w64-mingw32.shared' \
         MXE_PLUGIN_DIRS=plugins/llvm-mingw \
         MXE_USE_CCACHE= && \
-    rm -rf /mxe/pkg/
-RUN printf "\nMXE_PLUGIN_DIRS=plugins/llvm-mingw\nMXE_USE_CCACHE=" >> /mxe/settings.mk
-RUN echo 'export PATH="/mxe/usr/bin:${PATH}"' >> /etc/bash.bashrc
+    rm -rf ./pkg/
+RUN printf "\nMXE_PLUGIN_DIRS=plugins/llvm-mingw\nMXE_USE_CCACHE=" >> /opt/mxe/settings.mk
+RUN echo 'export PATH="/opt/mxe/usr/bin:${PATH}"' >> /etc/bash.bashrc
 
 WORKDIR /
 
